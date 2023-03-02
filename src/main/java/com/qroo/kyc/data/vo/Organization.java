@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.*;
 import jakarta.persistence.*;
 
@@ -27,16 +28,21 @@ public class Organization implements Serializable {
     @Column(nullable = false, length = 20)
     private String mobileNumber;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "createdBy", nullable = false)
+    @JoinColumn(name = "createdBy", nullable = false, updatable = false)
     private User user;
     private String facebook;
     private String google;
     private String twitter;
     @Column(length = 20)
     private String whatsapp;
+    private String instagram;
     private String emailAddress;
     private String logo;
     private String banner;
+    private BigDecimal kiingilioRateAmount;
+    private Double kiingilioRatePercentage;
+    @Column(nullable = false)
+    private String alias;
     @Column(columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false, updatable = false)

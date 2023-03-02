@@ -1,13 +1,17 @@
 package com.qroo.kyc.controllers;
 
 import com.qroo.common.data.constants.Status;
+import com.qroo.kyc.data.dao.filters.SearchRequest;
 import com.qroo.kyc.data.vo.Account;
 import com.qroo.kyc.data.vo.Organization;
+import com.qroo.kyc.data.vo.User;
 import com.qroo.kyc.services.AccountsService;
 import com.qroo.kyc.services.OrganizationsService;
+import com.qroo.kyc.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
@@ -18,6 +22,8 @@ public
 class OrganizationsController {
     @Autowired
     OrganizationsService service;
+    @Autowired
+    UserService userService;
     @Autowired
     AccountsService accountService;
     private final Logger logger;
@@ -30,6 +36,10 @@ class OrganizationsController {
         return service.getAllOrganizations();
     }
 
+    public Page<Organization> searchOrganizations(SearchRequest request){
+        return service.searchOrganizations(request);
+    }
+
     public Organization getOrganization(Long id){
         return service.getById(id);
     }
@@ -37,6 +47,7 @@ class OrganizationsController {
     public Organization createOrganization(Organization organization){
         Organization createdOrganization = null;
         try{
+            User user = userService.getById(organization.getUser().getId());
             createdOrganization = service.createOrganization(organization);
             //Create account if organization created successfully
             if ( createdOrganization != null ){
@@ -46,7 +57,7 @@ class OrganizationsController {
                 account.setCurrentBalance(BigDecimal.valueOf(0));
                 account.setTotalSpent(BigDecimal.valueOf(0));
                 account.setOrganization(createdOrganization);
-
+                account.setUser(user);
                 try{
                     accountService.createAccount(account);
                 }catch(Exception e){
@@ -60,16 +71,21 @@ class OrganizationsController {
         return createdOrganization;
     }
 
-    public Organization modifyOrganization(Long id, Organization organization, String action){
-        if (action == "DELETE"){
-            organization.setStatus(Status.DELETED);
-        }
+    public Organization modifyOrganization(Long id, Organization organization){
         return service.updateOrganization(id, organization);
     }
 
-    public List<Account> getOrganizationAccounts(Long id){
+    public Organization modifyOrganization(Long id, Status status){
+        Organization organizationToDelete = service.getById(id);
+        if ( organizationToDelete != null){
+            organizationToDelete.setStatus(status);
+        }
+        return service.updateOrganization(id, organizationToDelete);
+    }
+
+    public Account getOrganizationAccounts(Long id){
         Organization organizationObj = null;
-        List<Account> organizationAcc = null;
+        Account organizationAcc = null;
         try{
             organizationObj = service.getById(id);
             if ( organizationObj != null ){
@@ -84,4 +100,5 @@ class OrganizationsController {
         }
         return organizationAcc;
     }
+
 }

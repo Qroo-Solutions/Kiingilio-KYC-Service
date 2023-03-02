@@ -23,6 +23,8 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    private String uid;
+    @Column(nullable = false)
     private String firstName;
 
     private String middleName;
@@ -40,8 +42,14 @@ public class User implements Serializable {
     @Column(nullable = false, length = 20, unique = true)
     private String mobileNumber;
 
+    @Column(length = 20, unique = true)
+    private String whatsappNumber;
+
     @Column(nullable = false)
     private Byte verifiedMobileNumber=0;
+
+    private boolean isEmailVerified;
+    private String issuer;
 
     private String nationality;
 
@@ -49,7 +57,7 @@ public class User implements Serializable {
 
     private String region;
 
-    private String email;
+    private String emailAddress;
 
     private Date dateOfBirth;
 
@@ -60,6 +68,11 @@ public class User implements Serializable {
     private Float longitude;
 
     private String language;
+
+    private String instagram;
+    private String facebook;
+    private String google;
+    private String twitter;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role", nullable = false)

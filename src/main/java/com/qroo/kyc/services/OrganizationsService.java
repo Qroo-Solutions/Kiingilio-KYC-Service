@@ -1,10 +1,13 @@
 package com.qroo.kyc.services;
 
 import com.qroo.kyc.data.dao.OrganizationsRepository;
-import com.qroo.kyc.data.vo.Account;
+import com.qroo.kyc.data.dao.filters.SearchRequest;
+import com.qroo.kyc.data.dao.filters.SearchSpecification;
 import com.qroo.kyc.data.vo.Organization;
 import com.qroo.kyc.data.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +18,11 @@ public class OrganizationsService {
     OrganizationsRepository repository;
     public List<Organization> getAllOrganizations(){
         return repository.findAll();
+    }
+    public Page<Organization> searchOrganizations(SearchRequest request) {
+        SearchSpecification<Organization> specification = new SearchSpecification<>(request);
+        Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
+        return repository.findAll(specification, pageable);
     }
 
     public Organization getById(Long id){

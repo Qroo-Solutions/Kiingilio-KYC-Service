@@ -25,7 +25,7 @@ public class AccountsService {
    public Account getByUser(User user){
         return repository.findByUser(user);
     }
-    public List<Account> getByOrganization(Organization organization){
+    public Account getByOrganization(Organization organization){
         return repository.findByOrganization(organization);
     }
 

@@ -6,15 +6,18 @@ import com.qroo.common.data.dto.UserResponseDto;
 import com.qroo.common.utility.ApiResponse;
 import com.qroo.kyc.controllers.AccountsController;
 import com.qroo.kyc.controllers.UsersController;
+import com.qroo.kyc.data.dao.filters.SearchRequest;
 import com.qroo.kyc.data.vo.Account;
 import com.qroo.kyc.data.vo.Organization;
 import com.qroo.kyc.data.vo.User;
 import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,8 +59,30 @@ public class Users {
         }
     }
 
-    @GetMapping(value ="/user/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ApiResponse<UserResponseDto>> fetchUser(@PathVariable Long id) {
+    @PostMapping(value = "/users", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ApiResponse<Page<User>>> search(@AuthenticationPrincipal @RequestBody SearchRequest request) {
+        ApiResponse<Page<User>> responseObject = new ApiResponse<>();
+        try {
+            Page<User> queryResponse = usersController.searchUsers(request);
+
+            if( ObjectUtils.isEmpty(queryResponse) ) {
+                responseObject.setCode("400");
+                responseObject.setMessage("No response from users service");
+            }
+            responseObject.setCode("200");
+            responseObject.setPayload(queryResponse);
+            responseObject.setMessage("Users fetched successfully");
+            return new ResponseEntity<>(responseObject, HttpStatus.OK);
+        }catch (Exception e) {
+            logger.error("Exception while fetching users: {}", e.toString());
+            responseObject.setMessage(e.getMessage());
+            responseObject.setCode("500");
+            return new ResponseEntity<>(responseObject, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(value ="/user/{uid}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ApiResponse<UserResponseDto>> fetchUser(@PathVariable String uid) {
         ModelMapper modelMapper = new ModelMapper();
         ApiResponse<UserResponseDto> responseObject = new ApiResponse<>();
 
@@ -67,19 +92,17 @@ public class Users {
 
         try {
             //Get data
-            User user = usersController.getUser(id);
-            Account account = usersController.getUserAccounts(user.getId());
+            List<User> user = usersController.getUser(uid);
+            Account account = usersController.getUserAccounts(user.get(0).getId());
 
             //Map data to DTO
             if ( user != null ){
-                userResponse = modelMapper.map(user, UserDto.class);
+                userResponse = modelMapper.map(user.get(0), UserDto.class);
             }
 
             if ( account != null ){
                 accountResponse = modelMapper.map(account, AccountDto.class);
             }
-
-
             //Build response
             userResponseDto.setUser(userResponse);
             userResponseDto.setAccount(accountResponse);
@@ -103,7 +126,9 @@ public class Users {
     @PostMapping(value ="/user/create", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ApiResponse<User>> createUser(@RequestBody User user) {
         ApiResponse<User> responseObject = new ApiResponse<>();
+        logger.debug(user.toString());
         try {
+
             User userCreated = usersController.createUser(user);
 
             if( ObjectUtils.isEmpty(userCreated) ) {

@@ -2,9 +2,9 @@ package com.qroo.kyc.controllers;
 
 
 import com.qroo.common.data.constants.Status;
+import com.qroo.kyc.data.dao.filters.SearchRequest;
 import com.qroo.kyc.data.vo.Account;
 import com.qroo.kyc.data.vo.Organization;
-import com.qroo.kyc.data.vo.Role;
 import com.qroo.kyc.data.vo.User;
 import com.qroo.kyc.services.AccountsService;
 import com.qroo.kyc.services.OrganizationsService;
@@ -12,6 +12,7 @@ import com.qroo.kyc.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
@@ -35,8 +36,12 @@ public class UsersController {
         return service.getAllUsers();
     }
 
-    public User getUser(Long id){
-        return service.getById(id);
+    public Page<User> searchUsers(SearchRequest request){
+        return service.searchUsers(request);
+    }
+
+    public List<User> getUser(String uid){
+        return service.getByUid(uid);
     }
 
     public User createUser(User user){
