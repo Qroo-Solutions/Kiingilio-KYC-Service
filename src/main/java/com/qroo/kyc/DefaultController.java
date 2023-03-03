@@ -11,7 +11,13 @@ public class DefaultController {
     @GetMapping("/")
     @ResponseBody
     public String index() {
-        return "Welcome to Kiingilio Services";
+        return "Unauthorised access";
+    }
+
+    @GetMapping("/health")
+    @ResponseBody
+    public String health() {
+        return "Check";
     }
 
 }

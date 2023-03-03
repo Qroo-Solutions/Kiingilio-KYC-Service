@@ -97,7 +97,7 @@ public class SecurityConfig {
         // We don't need CSRF for this example
         httpSecurity.csrf().disable()
             // don't authenticate this particular request
-            .authorizeHttpRequests().requestMatchers("/swagger-ui").permitAll()
+            .authorizeHttpRequests().requestMatchers("/swagger-ui", "/health").permitAll()
             // all other requests need to be authenticated
             .anyRequest().authenticated().and()
             // make sure we use stateless session; session won't be used to
