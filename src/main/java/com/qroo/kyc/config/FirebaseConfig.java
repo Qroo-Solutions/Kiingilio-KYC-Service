@@ -24,7 +24,7 @@ public class FirebaseConfig {
     public void firebaseInit() {
         InputStream inputStream = null;
         try {
-            inputStream = new ClassPathResource("firebase_config.json").getInputStream();
+            inputStream = new ClassPathResource("credentials/firebase_credentials.json").getInputStream();
         } catch (IOException e3) {
             e3.printStackTrace();
         }
