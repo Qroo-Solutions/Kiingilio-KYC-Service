@@ -92,12 +92,12 @@ public class Users {
 
         try {
             //Get data
-            List<User> user = usersController.getUser(uid);
-            Account account = usersController.getUserAccounts(user.get(0).getId());
+            User user = usersController.getUser(uid);
+            Account account = usersController.getUserAccounts(user.getId());
 
             //Map data to DTO
             if ( user != null ){
-                userResponse = modelMapper.map(user.get(0), UserDto.class);
+                userResponse = modelMapper.map(user, UserDto.class);
             }
 
             if ( account != null ){
@@ -238,11 +238,11 @@ public class Users {
         }
     }
 
-    @GetMapping(value ="/user/{id}/organizations", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ApiResponse<Organization>> getUserOrganizations(@PathVariable Long id) {
-        ApiResponse<Organization> responseObject = new ApiResponse<>();
+    @GetMapping(value ="/user/{uid}/organizations", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ApiResponse<List<Organization>>> getUserOrganizations(@PathVariable String uid) {
+        ApiResponse<List<Organization>> responseObject = new ApiResponse<>();
         try {
-            Organization organizations = usersController.getUserOrganization(id);
+            List<Organization> organizations = usersController.getUserOrganization(uid);
 
             if( ObjectUtils.isEmpty(organizations) ) {
                 responseObject.setCode("400");
@@ -250,7 +250,7 @@ public class Users {
             }
             responseObject.setCode("200");
             responseObject.setPayload(organizations);
-            responseObject.setMessage("User account fetched successfully");
+            responseObject.setMessage("User organizations fetched successfully");
             return new ResponseEntity<>(responseObject, HttpStatus.OK);
         }catch(Exception e) {
             logger.error("Exception while fetching organizations: {}", e.toString());

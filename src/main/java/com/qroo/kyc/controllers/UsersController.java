@@ -40,7 +40,7 @@ public class UsersController {
         return service.searchUsers(request);
     }
 
-    public List<User> getUser(String uid){
+    public User getUser(String uid){
         return service.getByUid(uid);
     }
 
@@ -112,16 +112,15 @@ public class UsersController {
         return userOrganizations;
     }
 
-    public Organization getUserOrganization(Long id){
+    public List<Organization> getUserOrganization(String uid){
         User userObj = null;
-        Organization userOrganization = null;
+        List<Organization> userOrganizations = null;
         try{
-            userObj = service.getById(id);
+            userObj = service.getByUid(uid);
             if ( userObj != null ){
                 try{
-                    if ( userObj.getOrganization() != null && userObj.getOrganization().getId() != null ) {
-                        userOrganization = organizationsService.getById(userObj.getOrganization().getId());
-                    }
+                    userOrganizations = organizationsService.getByUser(userObj);
+
                 }catch(Exception e){
                     logger.error("Exception while fetching user organizations: {}", e.getMessage());
                 }
@@ -129,6 +128,6 @@ public class UsersController {
         }catch(Exception e){
             logger.error("Exception while fetching user organizations: {}", e.getMessage());
         }
-        return userOrganization;
+        return userOrganizations;
     }
 }

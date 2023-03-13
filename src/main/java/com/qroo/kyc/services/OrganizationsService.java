@@ -28,6 +28,12 @@ public class OrganizationsService {
     public Organization getById(Long id){
         return repository.findById(id).get();
     }
+    public Organization getByAlias(String alias){
+        return repository.findByAlias(alias);
+    }
+    public List<Organization> getByUser(User user){
+        return repository.findByUser(user);
+    }
 
     public Organization createOrganization( Organization organization){
         return repository.save(organization);

@@ -31,7 +31,8 @@ public class UserService{
     public User getById(Long id){
         return repository.findById(id).get();
     }
-    public List<User> getByUid(String uid){
+
+    public User getByUid(String uid){
         return repository.findByUid(uid);
     }
 

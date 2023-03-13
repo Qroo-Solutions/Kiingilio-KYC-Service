@@ -47,8 +47,14 @@ class OrganizationsController {
     public Organization createOrganization(Organization organization){
         Organization createdOrganization = null;
         try{
-            User user = userService.getById(organization.getUser().getId());
+            User user = userService.getByUid(organization.getUser().getUid());
+            organization.setUser(user);
+
+            String alias = generateAlias(organization.getName(), 0);
+            organization.setAlias(alias);
+
             createdOrganization = service.createOrganization(organization);
+
             //Create account if organization created successfully
             if ( createdOrganization != null ){
                 Account account = new Account();
@@ -101,4 +107,20 @@ class OrganizationsController {
         return organizationAcc;
     }
 
+    public String generateAlias(String str, Integer increment){
+        String alias = null;
+        try{
+            alias = str.toLowerCase().strip().replaceAll("\\s+","-");
+
+            Organization aliasResult = service.getByAlias(alias);
+            if ( aliasResult != null ){
+                Integer nextIncrement = increment+1;
+                String nextStr = str+nextIncrement;
+                //Alias found, add number at the end and retry
+                return generateAlias(nextStr, nextIncrement);            }
+        }catch(Exception e){
+            logger.error("Exception while fetching events: {}", e.toString());
+        }
+        return alias;
+    }
 }

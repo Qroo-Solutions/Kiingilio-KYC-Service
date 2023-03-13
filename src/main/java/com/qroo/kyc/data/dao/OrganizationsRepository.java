@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface OrganizationsRepository extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
     List<Organization> findByUser(User user);
+    Organization findByAlias(String alias);
+    //List<Organization> findByUid(String uid);
 }

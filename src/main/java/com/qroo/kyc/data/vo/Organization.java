@@ -28,7 +28,7 @@ public class Organization implements Serializable {
     @Column(nullable = false, length = 20)
     private String mobileNumber;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "createdBy", nullable = false, updatable = false)
+    @JoinColumn(name = "user", nullable = false, updatable = false)
     private User user;
     private String facebook;
     private String google;
@@ -41,7 +41,7 @@ public class Organization implements Serializable {
     private String banner;
     private BigDecimal kiingilioRateAmount;
     private Double kiingilioRatePercentage;
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String alias;
     @Column(columnDefinition = "TEXT")
     private String description;

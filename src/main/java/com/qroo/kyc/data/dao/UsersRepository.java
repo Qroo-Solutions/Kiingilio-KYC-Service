@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface UsersRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
-    List<User> findByUid(String uid);
+    User findByUid(String uid);
 }
